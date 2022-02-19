@@ -43,7 +43,7 @@ const createScene = function() {
 
     instance.position.x = getRandomInt(-20, 20)
     instance.position.y = getRandomInt(-20, 20)
-    instance.position.z = getRandomInt(0, 100)
+    instance.position.z = getRandomInt(0, 50)
 
     instance.velocity = getRandomInt(1, 15)
 
@@ -72,7 +72,8 @@ const createScene = function() {
           var pickedMesh = pickResult.pickedMesh;
           if (pickedMesh) {
             //createGUIButton(pickedMesh)
-            pickedMesh.position.z = pickedMesh.position.z + 10
+            pickedMesh.position.z = 50
+            pickedMesh.velocity = 0
           }
         }
         break;
@@ -123,7 +124,7 @@ engine.runRenderLoop( function() {
   for (let i = 0; i < boxes.length; i++) {
     boxes[i].position.z = boxes[i].position.z - boxes[i].velocity / 100
     if ( boxes[i].position.z < -50 ) {
-      boxes[i].position.z = 200
+      boxes[i].position.z = 50
     }
   }
   scene.render()
