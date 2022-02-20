@@ -21,6 +21,13 @@ const createScene = function() {
   const camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0,1,0), scene)
   camera.attachControl(canvas, true)
 
+  const arena = BABYLON.MeshBuilder.CreateSphere("arena", {diameter: 100}, scene)
+  arena.rotation.x = 1.5
+  arena.flipFaces(true)
+  const arenaMat = new BABYLON.StandardMaterial("arenaMat", scene);
+  arena.material = arenaMat
+  arenaMat.wireframe = true
+
   const pillMaster = BABYLON.MeshBuilder.CreateSphere("sphere", {segments: 4, diameterX: 1, diameterY: 1, diameterZ: 0.5}, scene)
 
   const material = new BABYLON.StandardMaterial("white", scene)
@@ -42,8 +49,11 @@ const createScene = function() {
 
     pills.push(instance)
 
-    instance.position.x = getRandomInt(-20, 20)
-    instance.position.y = getRandomInt(-20, 20)
+    let radius = 20 * Math.sqrt(Math.random())
+    let theta = Math.random() * 2 * Math.PI
+
+    instance.position.x = radius * Math.cos(theta)
+    instance.position.y = radius * Math.sin(theta) + 4
     instance.position.z = far
 
     instance.velocity = getRandomInt(1, 15)
@@ -54,7 +64,7 @@ const createScene = function() {
 
     let endPosition = new BABYLON.Vector3(0,1,0)
 
-    BABYLON.Animation.CreateAndStartAnimation("anim", instance, "position", 30, getRandomInt(3, 20)*100, startPosition, endPosition, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    BABYLON.Animation.CreateAndStartAnimation("anim"+i, instance, "position", 30, getRandomInt(3, 20)*100, startPosition, endPosition, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
     pillMaster.instancedBuffers.color = new BABYLON.Color4(1, Math.random(), Math.random(), 1)
 
@@ -79,7 +89,10 @@ const createScene = function() {
           var pickedMesh = pickResult.pickedMesh;
           if (pickedMesh) {
             //createGUIButton(pickedMesh)
-            pickedMesh.position.z = far
+            scene.stopAnimation(pickedMesh)
+            pickedMesh.position.x = 0
+            pickedMesh.position.y = 0
+            pickedMesh.position.z = 0
             pickedMesh.velocity = 0
           }
         }
