@@ -10,26 +10,27 @@ const engine = new BABYLON.Engine(canvas, true)
 
 const getRandomInt = ( min, max ) => Math.floor( Math.random() * ( max - min ) ) + min
 
-let boxes = []
+const pills = []
+const far = 60
 
 const createScene = function() {
 
   const scene = new BABYLON.Scene(engine)
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0)
 
-  const camera = new BABYLON.ArcRotateCamera("Camera", -1.5, 1.5, 36, BABYLON.Vector3.Zero(), scene)
+  const camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0,1,0), scene)
   camera.attachControl(canvas, true)
 
-  const box = BABYLON.BoxBuilder.CreateBox("box", {size: 1}, scene)
+  const pillMaster = BABYLON.MeshBuilder.CreateSphere("sphere", {segments: 4, diameterX: 1, diameterY: 1, diameterZ: 0.5}, scene)
 
   const material = new BABYLON.StandardMaterial("white", scene)
 
   material.diffuseColor = BABYLON.Color3.White()
 
-  box.material = material
+  pillMaster.material = material
 
-  box.registerInstancedBuffer("color", 4)
-  box.instancedBuffers.color = new BABYLON.Color4(1, 0, 0, 1)
+  pillMaster.registerInstancedBuffer("color", 4)
+  pillMaster.instancedBuffers.color = new BABYLON.Color4(1, 0, 0, 1)
 
   scene.createDefaultLight()
 
@@ -37,19 +38,25 @@ const createScene = function() {
 
   for (let i = 0; i < count; i++) {
 
-    const instance = box.createInstance("box" + i)
+    const instance = pillMaster.createInstance("sphere" + i)
 
-    boxes.push(instance)
+    pills.push(instance)
 
     instance.position.x = getRandomInt(-20, 20)
     instance.position.y = getRandomInt(-20, 20)
-    instance.position.z = getRandomInt(0, 50)
+    instance.position.z = far
 
     instance.velocity = getRandomInt(1, 15)
 
-    instance.metadata = "box" + i
+    instance.metadata = "sphere" + i
 
-    box.instancedBuffers.color = new BABYLON.Color4(1, Math.random(), Math.random(), 1)
+    let startPosition = new BABYLON.Vector3(instance.position.x, instance.position.y, instance.position.z)
+
+    let endPosition = new BABYLON.Vector3(0,1,0)
+
+    BABYLON.Animation.CreateAndStartAnimation("anim", instance, "position", 30, getRandomInt(3, 20)*100, startPosition, endPosition, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+    pillMaster.instancedBuffers.color = new BABYLON.Color4(1, Math.random(), Math.random(), 1)
 
   }
 
@@ -72,7 +79,7 @@ const createScene = function() {
           var pickedMesh = pickResult.pickedMesh;
           if (pickedMesh) {
             //createGUIButton(pickedMesh)
-            pickedMesh.position.z = 50
+            pickedMesh.position.z = far
             pickedMesh.velocity = 0
           }
         }
@@ -83,9 +90,13 @@ const createScene = function() {
 
   });
 
-  scene.debugLayer.show({
-    embedMode: true,
-  })
+  // scene.debugLayer.show({
+  //   embedMode: true,
+  // })
+
+  // var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI(
+  //   "myUI"
+  // );
 
   function createGUIButton(hit) {
     let label = hit.metadata
@@ -121,12 +132,14 @@ const createScene = function() {
 const scene = createScene()
 
 engine.runRenderLoop( function() {
-  for (let i = 0; i < boxes.length; i++) {
-    boxes[i].position.z = boxes[i].position.z - boxes[i].velocity / 100
-    if ( boxes[i].position.z < -50 ) {
-      boxes[i].position.z = 50
-    }
-  }
+
+  // for (let i = 0; i < pills.length; i++) {
+  //   pills[i].position.z = pills[i].position.z - pills[i].velocity / 100
+  //   if ( pills[i].position.z < -50 ) {
+  //     pills[i].position.z = 50
+  //   }
+  // }
+
   scene.render()
 } )
 
